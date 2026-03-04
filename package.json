@@ -1,6 +1,6 @@
 {
   "name": "@genart-dev/plugin-textures",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Procedural surface texture layer plugins for genart.dev",
   "type": "module",
   "main": "./dist/index.cjs",
