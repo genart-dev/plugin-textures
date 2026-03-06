@@ -1,0 +1,54 @@
+{
+  "genart": "1.2",
+  "id": "noise-ridged",
+  "title": "Noise — Ridged",
+  "created": "2026-03-06T00:00:00Z",
+  "modified": "2026-03-06T00:00:00Z",
+  "renderer": { "type": "canvas2d" },
+  "canvas": { "width": 600, "height": 600 },
+  "parameters": [],
+  "colors": [],
+  "state": { "seed": 1, "params": {}, "colorPalette": [] },
+  "algorithm": "function sketch() { return {}; }",
+  "layers": [
+    {
+      "id": "noise",
+      "type": "textures:noise",
+      "name": "Noise Ridged",
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "transform": { "x": 0, "y": 0, "width": 600, "height": 600, "rotation": 0, "scaleX": 1, "scaleY": 1, "anchorX": 0, "anchorY": 0 },
+      "properties": {
+        "type": "ridged",
+        "scale": 80,
+        "octaves": 4,
+        "colorA": "#f8f4ee",
+        "colorB": "#8a7a6a",
+        "seed": 0
+      }
+    },
+    {
+      "id": "label",
+      "type": "typography:text",
+      "name": "Label",
+      "visible": true,
+      "locked": false,
+      "opacity": 0.5,
+      "blendMode": "normal",
+      "transform": { "x": 10, "y": 576, "width": 300, "height": 20, "rotation": 0, "scaleX": 1, "scaleY": 1, "anchorX": 0, "anchorY": 0 },
+      "properties": {
+        "text": "noise: ridged",
+        "fontFamily": "Inter",
+        "fontSize": 14,
+        "fontWeight": "700",
+        "fontStyle": "normal",
+        "color": "#000000",
+        "align": "left",
+        "baseline": "bottom",
+        "lineHeight": 1.2
+      }
+    }
+  ]
+}

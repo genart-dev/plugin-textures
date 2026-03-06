@@ -4,6 +4,23 @@ Procedural surface texture layer plugin for [genart.dev](https://genart.dev) —
 
 Part of [genart.dev](https://genart.dev) — a generative art platform with an MCP server, desktop app, and IDE extensions.
 
+## Examples
+
+<table>
+<tr>
+<td><img src="test-renders/paper-cold-press.png" width="220" /><br><em>Paper — cold press</em></td>
+<td><img src="test-renders/paper-rough.png" width="220" /><br><em>Paper — rough</em></td>
+<td><img src="test-renders/canvas-default.png" width="220" /><br><em>Canvas weave</em></td>
+</tr>
+<tr>
+<td><img src="test-renders/washi-default.png" width="220" /><br><em>Washi paper</em></td>
+<td><img src="test-renders/noise-fractal.png" width="220" /><br><em>Noise — fractal (fBm)</em></td>
+<td><img src="test-renders/noise-ridged.png" width="220" /><br><em>Noise — ridged</em></td>
+</tr>
+</table>
+
+Source files: [paper-cold-press.genart](test-renders/paper-cold-press.genart) · [paper-rough.genart](test-renders/paper-rough.genart) · [canvas-default.genart](test-renders/canvas-default.genart) · [washi-default.genart](test-renders/washi-default.genart) · [noise-fractal.genart](test-renders/noise-fractal.genart) · [noise-ridged.genart](test-renders/noise-ridged.genart)
+
 ## Install
 
 ```bash
@@ -106,21 +123,6 @@ Exposed to AI agents through the MCP server when this plugin is registered:
 | `add_canvas_texture` | Add a canvas weave texture layer |
 | `add_washi_texture` | Add a washi fiber paper texture layer |
 | `add_noise_texture` | Add a noise texture layer (value, fractal, or ridged) |
-
-## Examples
-
-<table>
-<tr>
-<td><img src="images/paper-cold-press.png" width="220" /><br><em>Paper — cold press</em></td>
-<td><img src="images/paper-rough.png" width="220" /><br><em>Paper — rough</em></td>
-<td><img src="images/canvas-default.png" width="220" /><br><em>Canvas weave</em></td>
-</tr>
-<tr>
-<td><img src="images/washi-default.png" width="220" /><br><em>Washi paper</em></td>
-<td><img src="images/noise-fractal.png" width="220" /><br><em>Noise — fractal (fBm)</em></td>
-<td><img src="images/noise-ridged.png" width="220" /><br><em>Noise — ridged</em></td>
-</tr>
-</table>
 
 ## Related Packages
 
