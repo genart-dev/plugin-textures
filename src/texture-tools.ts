@@ -10,6 +10,9 @@ import { paperLayerType } from "./paper-texture.js";
 import { canvasLayerType } from "./canvas-texture.js";
 import { washiLayerType } from "./washi-texture.js";
 import { noiseTextureLayerType } from "./noise-texture.js";
+import { linenLayerType } from "./linen-texture.js";
+import { parchmentLayerType } from "./parchment-texture.js";
+import { concreteLayerType } from "./concrete-texture.js";
 
 function textResult(text: string): McpToolResult {
   return { content: [{ type: "text", text }] };
@@ -187,6 +190,89 @@ export const addNoiseTextureTool: McpToolDefinition = {
   },
 };
 
+export const addLinenTextureTool: McpToolDefinition = {
+  name: "add_linen_texture",
+  description: "Add a fine linen/fabric weave texture layer with regular thread structure.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      threadSpacing: { type: "number", description: "Thread spacing in px 1–10 (default: 3)." },
+      warpWeight:    { type: "number", description: "Vertical thread weight 0–1 (default: 0.5)." },
+      weftWeight:    { type: "number", description: "Horizontal thread weight 0–1 (default: 0.4)." },
+      irregularity:  { type: "number", description: "Weave irregularity 0–1 (default: 0.15)." },
+      color:         { type: "string", description: 'Color hex (default: "#e8e0d0").' },
+      opacity:       { type: "number", description: "Layer opacity 0–1 (default: 1.0)." },
+      seed:          { type: "number", description: "Random seed (default: 0)." },
+      index:         { type: "number", description: "Stack position (default: 0)." },
+    },
+  } satisfies JsonSchema,
+
+  async handler(input: Record<string, unknown>, context: McpToolContext): Promise<McpToolResult> {
+    const properties = { ...linenLayerType.createDefault(), ...filterKnown(input, ["threadSpacing", "warpWeight", "weftWeight", "irregularity", "color", "seed"]) };
+    const opacity = typeof input.opacity === "number" ? input.opacity : 1;
+    const idx = typeof input.index === "number" ? input.index : 0;
+    const layer = createTextureLayer("textures:linen", "Linen Texture", properties, opacity, context);
+    context.layers.add(layer, idx);
+    context.emitChange("layer-added");
+    return textResult(`Added linen texture layer '${layer.id}'.`);
+  },
+};
+
+export const addParchmentTextureTool: McpToolDefinition = {
+  name: "add_parchment_texture",
+  description: "Add an aged parchment/vellum texture with foxing spots, staining, and edge darkening.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      aging:          { type: "number", description: "Overall aging amount 0–1 (default: 0.5)." },
+      foxingDensity:  { type: "number", description: "Brown foxing spot density 0–1 (default: 0.3)." },
+      stainIntensity: { type: "number", description: "Tea/coffee stain intensity 0–1 (default: 0.4)." },
+      edgeDarkening:  { type: "number", description: "Edge vignette darkening 0–1 (default: 0.3)." },
+      color:          { type: "string", description: 'Base color hex (default: "#ede4d3").' },
+      opacity:        { type: "number", description: "Layer opacity 0–1 (default: 1.0)." },
+      seed:           { type: "number", description: "Random seed (default: 0)." },
+      index:          { type: "number", description: "Stack position (default: 0)." },
+    },
+  } satisfies JsonSchema,
+
+  async handler(input: Record<string, unknown>, context: McpToolContext): Promise<McpToolResult> {
+    const properties = { ...parchmentLayerType.createDefault(), ...filterKnown(input, ["aging", "foxingDensity", "stainIntensity", "edgeDarkening", "color", "seed"]) };
+    const opacity = typeof input.opacity === "number" ? input.opacity : 1;
+    const idx = typeof input.index === "number" ? input.index : 0;
+    const layer = createTextureLayer("textures:parchment", "Parchment", properties, opacity, context);
+    context.layers.add(layer, idx);
+    context.emitChange("layer-added");
+    return textResult(`Added parchment texture layer '${layer.id}'.`);
+  },
+};
+
+export const addConcreteTextureTool: McpToolDefinition = {
+  name: "add_concrete_texture",
+  description: "Add a concrete/stone surface texture with coarse aggregate, pitting, and mineral flecks.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      coarseness: { type: "number", description: "Grain coarseness 0–1 (default: 0.5)." },
+      pitting:    { type: "number", description: "Surface pitting/voids 0–1 (default: 0.3)." },
+      variation:  { type: "number", description: "Color variation 0–1 (default: 0.2)." },
+      color:      { type: "string", description: 'Color hex (default: "#b0aba3").' },
+      opacity:    { type: "number", description: "Layer opacity 0–1 (default: 1.0)." },
+      seed:       { type: "number", description: "Random seed (default: 0)." },
+      index:      { type: "number", description: "Stack position (default: 0)." },
+    },
+  } satisfies JsonSchema,
+
+  async handler(input: Record<string, unknown>, context: McpToolContext): Promise<McpToolResult> {
+    const properties = { ...concreteLayerType.createDefault(), ...filterKnown(input, ["coarseness", "pitting", "variation", "color", "seed"]) };
+    const opacity = typeof input.opacity === "number" ? input.opacity : 1;
+    const idx = typeof input.index === "number" ? input.index : 0;
+    const layer = createTextureLayer("textures:concrete", "Concrete", properties, opacity, context);
+    context.layers.add(layer, idx);
+    context.emitChange("layer-added");
+    return textResult(`Added concrete texture layer '${layer.id}'.`);
+  },
+};
+
 function filterKnown(
   input: Record<string, unknown>,
   keys: string[],
@@ -203,4 +289,7 @@ export const textureMcpTools: McpToolDefinition[] = [
   addCanvasTextureTool,
   addWashiTextureTool,
   addNoiseTextureTool,
+  addLinenTextureTool,
+  addParchmentTextureTool,
+  addConcreteTextureTool,
 ];
