@@ -72,6 +72,8 @@ const PARCHMENT_PROPERTIES: LayerPropertySchema[] = [
 
 export const parchmentLayerType: LayerTypeDefinition = {
   typeId: "textures:parchment",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Parchment / Aged Paper",
   icon: "parchment",
   category: "draw",
@@ -104,6 +106,10 @@ export const parchmentLayerType: LayerTypeDefinition = {
     if (w <= 0 || h <= 0) return;
 
     const rand = mulberry32(seed);
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
     const baseNoise = createFractalNoise(seed, 4);
     const stainNoise = createFractalNoise(seed + 7919, 3);
     const foxNoise = createValueNoise(seed + 3571);
@@ -131,10 +137,10 @@ export const parchmentLayerType: LayerTypeDefinition = {
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         // Base paper grain
-        const grain = baseNoise(px * 0.015, py * 0.015) * aging * 0.12;
+        const grain = baseNoise((px * 0.015) / dsc, (py * 0.015) / dsc) * aging * 0.12;
 
         // Large amorphous stains — warm tea/coffee tint
-        const stain = stainNoise(px * 0.004, py * 0.004);
+        const stain = stainNoise((px * 0.004) / dsc, (py * 0.004) / dsc);
         const stainFactor = stain > 0.55
           ? (stain - 0.55) * (1 / 0.45) * stainIntensity * 0.2
           : 0;
@@ -155,7 +161,7 @@ export const parchmentLayerType: LayerTypeDefinition = {
           if (d2 < r2) {
             // Soft falloff with noise modulation
             const falloff = 1 - d2 / r2;
-            const nMod = foxNoise(px * 0.1, py * 0.1);
+            const nMod = foxNoise((px * 0.1) / dsc, (py * 0.1) / dsc);
             foxFactor = Math.max(foxFactor, falloff * spot.intensity * nMod);
           }
         }

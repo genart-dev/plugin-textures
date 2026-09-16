@@ -71,6 +71,8 @@ const LINEN_PROPERTIES: LayerPropertySchema[] = [
 
 export const linenLayerType: LayerTypeDefinition = {
   typeId: "textures:linen",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Linen Texture",
   icon: "linen",
   category: "draw",
@@ -102,6 +104,10 @@ export const linenLayerType: LayerTypeDefinition = {
     const h = Math.ceil(bounds.height);
     if (w <= 0 || h <= 0) return;
 
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
     const noise = createValueNoise(seed);
     const [cr, cg, cb] = hexToRgba(colorHex);
 
@@ -111,8 +117,8 @@ export const linenLayerType: LayerTypeDefinition = {
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         // Fine regular weave — alternating warp (vertical) and weft (horizontal) threads
-        const warpPhase = Math.abs(Math.sin((py / threadSpacing) * Math.PI));
-        const weftPhase = Math.abs(Math.sin((px / threadSpacing) * Math.PI));
+        const warpPhase = Math.abs(Math.sin((py / (threadSpacing * dsc)) * Math.PI));
+        const weftPhase = Math.abs(Math.sin((px / (threadSpacing * dsc)) * Math.PI));
 
         // Plain weave: warp and weft cross at regular intervals
         // Thread prominence alternates based on position in the weave
@@ -122,7 +128,7 @@ export const linenLayerType: LayerTypeDefinition = {
           : weftPhase * weftWeight + (1 - warpPhase) * warpWeight * 0.3;
 
         // Subtle irregularity from low-frequency noise
-        const nv = noise(px * 0.03, py * 0.03) * irregularity;
+        const nv = noise((px * 0.03) / dsc, (py * 0.03) / dsc) * irregularity;
 
         // Combine: base brightness modulated by thread structure and irregularity
         const value = 1.0 - (threadValue * 0.25 + nv * 0.15);

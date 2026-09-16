@@ -61,6 +61,8 @@ const CANVAS_PROPERTIES: LayerPropertySchema[] = [
 
 export const canvasLayerType: LayerTypeDefinition = {
   typeId: "textures:canvas",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Canvas Texture",
   icon: "canvas",
   category: "draw",
@@ -91,6 +93,10 @@ export const canvasLayerType: LayerTypeDefinition = {
     const h = Math.ceil(bounds.height);
     if (w <= 0 || h <= 0) return;
 
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
     const valueNoise = createValueNoise(seed);
     const [cr, cg, cb] = hexToRgba(colorHex);
 
@@ -100,12 +106,12 @@ export const canvasLayerType: LayerTypeDefinition = {
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         // Orthogonal sine weave — horizontal and vertical fibers
-        const hv = Math.abs(Math.sin((py / weaveScale) * Math.PI));
-        const vv = Math.abs(Math.sin((px / weaveScale) * Math.PI));
+        const hv = Math.abs(Math.sin((py / (weaveScale * dsc)) * Math.PI));
+        const vv = Math.abs(Math.sin((px / (weaveScale * dsc)) * Math.PI));
         const weave = (hv + vv) * 0.5;
 
         // Low-frequency noise for surface roughness variation
-        const n = valueNoise(px * 0.02, py * 0.02) * roughness;
+        const n = valueNoise((px * 0.02) / dsc, (py * 0.02) / dsc) * roughness;
 
         // value close to 1 = bright fiber; lower = intersection shadow
         const value = 1.0 - (weave * density + n) * 0.3;

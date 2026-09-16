@@ -62,6 +62,8 @@ const CONCRETE_PROPERTIES: LayerPropertySchema[] = [
 
 export const concreteLayerType: LayerTypeDefinition = {
   typeId: "textures:concrete",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Concrete / Stone",
   icon: "concrete",
   category: "draw",
@@ -101,6 +103,11 @@ export const concreteLayerType: LayerTypeDefinition = {
 
     const [cr, cg, cb] = hexToRgba(colorHex);
 
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
+
     // Pre-scatter some aggregate highlights (lighter mineral flecks)
     const fleckCount = Math.round(variation * w * h * 0.0003);
     const flecks: Array<{ x: number; y: number; r: number; brightness: number }> = [];
@@ -108,7 +115,7 @@ export const concreteLayerType: LayerTypeDefinition = {
       flecks.push({
         x: rand() * w,
         y: rand() * h,
-        r: 1 + rand() * 3,
+        r: (1 + rand() * 3) * dsc,
         brightness: 0.05 + rand() * 0.1,
       });
     }
@@ -117,8 +124,8 @@ export const concreteLayerType: LayerTypeDefinition = {
     const data = imageData.data;
 
     // Coarseness controls the noise frequency — higher = larger grain
-    const coarseFreq = lerp(0.02, 0.008, coarseness);
-    const fineFreq = lerp(0.08, 0.04, coarseness);
+    const coarseFreq = lerp(0.02, 0.008, coarseness) / dsc;
+    const fineFreq = lerp(0.08, 0.04, coarseness) / dsc;
 
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
@@ -129,7 +136,7 @@ export const concreteLayerType: LayerTypeDefinition = {
         const fn = fineNoise(px * fineFreq, py * fineFreq);
 
         // Pitting: threshold noise to create small dark voids
-        const pn = pitNoise(px * 0.05, py * 0.05);
+        const pn = pitNoise((px * 0.05) / dsc, (py * 0.05) / dsc);
         const pitFactor = pn < pitting * 0.3 ? (pitting * 0.3 - pn) * 2 : 0;
 
         // Base value: combine scales
@@ -139,7 +146,7 @@ export const concreteLayerType: LayerTypeDefinition = {
           - pitFactor * 0.3;
 
         // Color variation: slight warm/cool shifts per region
-        const warmth = coarseNoise(px * 0.005 + 100, py * 0.005 + 100) * variation;
+        const warmth = coarseNoise((px * 0.005) / dsc + 100, (py * 0.005) / dsc + 100) * variation;
 
         const value = Math.max(0, base);
         const i = (py * w + px) * 4;

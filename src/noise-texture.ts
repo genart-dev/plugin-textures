@@ -70,6 +70,8 @@ const NOISE_PROPERTIES: LayerPropertySchema[] = [
 
 export const noiseTextureLayerType: LayerTypeDefinition = {
   typeId: "textures:noise",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Noise Texture",
   icon: "noise",
   category: "draw",
@@ -108,12 +110,16 @@ export const noiseTextureLayerType: LayerTypeDefinition = {
     const [ar, ag, ab] = hexToRgba(colorAHex);
     const [br, bg, bb] = hexToRgba(colorBHex);
 
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
     const imageData = ctx.createImageData(w, h);
     const data = imageData.data;
 
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
-        let n = noiseFn(px / scale, py / scale);
+        let n = noiseFn(px / (scale * dsc), py / (scale * dsc));
 
         // Ridged: invert and sharpen
         if (noiseType === "ridged") n = 1 - Math.abs(n * 2 - 1);

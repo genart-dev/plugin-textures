@@ -62,6 +62,8 @@ const PAPER_PROPERTIES: LayerPropertySchema[] = [
 
 export const paperLayerType: LayerTypeDefinition = {
   typeId: "textures:paper",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Paper Texture",
   icon: "paper",
   category: "draw",
@@ -93,6 +95,10 @@ export const paperLayerType: LayerTypeDefinition = {
     const h = Math.ceil(bounds.height);
     if (w <= 0 || h <= 0) return;
 
+    // Device pixels per layout unit (ADR 111). The bounds arrive already
+    // scaled, so every feature size below is scaled with them and the
+    // texture keeps its grain at the size it has on the paper.
+    const dsc = bounds.scale ?? 1;
     const noise = createFractalNoise(seed, preset.octaves);
     const [pr, pg, pb] = hexToRgba(colorHex);
 
@@ -101,8 +107,8 @@ export const paperLayerType: LayerTypeDefinition = {
 
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
-        const nx = px / preset.grainScale;
-        const ny = py / preset.grainScale;
+        const nx = px / (preset.grainScale * dsc);
+        const ny = py / (preset.grainScale * dsc);
         const n = noise(nx, ny);
 
         // Paper stays light — valleys go slightly darker

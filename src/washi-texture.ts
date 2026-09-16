@@ -51,6 +51,8 @@ const WASHI_PROPERTIES: LayerPropertySchema[] = [
 
 export const washiLayerType: LayerTypeDefinition = {
   typeId: "textures:washi",
+  // Builds its pixels at the canvas's own resolution (ADR 111).
+  resolution: "device",
   displayName: "Washi Paper",
   icon: "washi",
   category: "draw",
@@ -80,6 +82,10 @@ export const washiLayerType: LayerTypeDefinition = {
     const h = Math.ceil(bounds.height);
     if (w <= 0 || h <= 0) return;
 
+    // Device pixels per layout unit (ADR 111). Fibre count is taken from the
+    // canvas at its layout size so the paper keeps the same number of fibres
+    // per sheet, while each fibre's length and width scale with the buffer.
+    const dsc = bounds.scale ?? 1;
     const [cr, cg, cb] = hexToRgba(colorHex);
     const rand = mulberry32(seed);
 
@@ -95,7 +101,7 @@ export const washiLayerType: LayerTypeDefinition = {
     ctx.putImageData(imageData, bounds.x, bounds.y);
 
     // Draw long semi-transparent fiber streaks
-    const fiberCount = Math.round(fiberDensity * (w + h) * 1.5);
+    const fiberCount = Math.round(fiberDensity * ((w + h) / dsc) * 1.5);
     ctx.save();
 
     for (let f = 0; f < fiberCount; f++) {
@@ -105,12 +111,12 @@ export const washiLayerType: LayerTypeDefinition = {
 
       // Shallow angle ±15° from horizontal
       const angle = (rand() - 0.5) * (Math.PI / 6);
-      const len = fiberLength * (0.4 + rand() * 0.6);
+      const len = fiberLength * dsc * (0.4 + rand() * 0.6);
       const endX = startX + Math.cos(angle) * len;
       const endY = startY + Math.sin(angle) * len;
 
       // Width: 0.2–1.2px; opacity: very subtle
-      const lineWidth = 0.2 + rand() * 1.0;
+      const lineWidth = (0.2 + rand() * 1.0) * dsc;
       const alpha = 0.04 + rand() * 0.10;
 
       // Fiber color: slightly darker or lighter than base
