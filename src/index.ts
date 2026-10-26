@@ -11,7 +11,7 @@ import { textureMcpTools } from "./texture-tools.js";
 const texturesPlugin: DesignPlugin = {
   id: "textures",
   name: "Textures",
-  version: "0.2.0",
+  version: "0.3.0",
   tier: "free",
   description: "Procedural surface textures: paper, canvas, washi, noise, linen, parchment, concrete.",
 

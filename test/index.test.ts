@@ -10,8 +10,8 @@ describe("texturesPlugin", () => {
     expect(texturesPlugin.name).toBe("Textures");
   });
 
-  it("has version 0.2.0", () => {
-    expect(texturesPlugin.version).toBe("0.2.0");
+  it("has version 0.3.0", () => {
+    expect(texturesPlugin.version).toBe("0.3.0");
   });
 
   it("registers all 7 layer types", () => {
